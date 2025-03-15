@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>Python_Script.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #808080;}
+.s4 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Python_Script.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+
+
+<span class="s0">def </span><span class="s1">generate_quarterly_sales_report(file_path</span><span class="s0">, </span><span class="s1">state</span><span class="s0">, </span><span class="s1">year</span><span class="s0">, </span><span class="s1">output_file):</span>
+    <span class="s2">&quot;&quot;&quot; 
+    Generates a quarterly sales report for a given state and year. 
+ 
+    Parameters: 
+    file_path (str): Path to the input Excel file. 
+    state (str): State to filter data. 
+    year (int): Year to filter data. 
+    output_file (str): Path to save the output Excel file. 
+    &quot;&quot;&quot;</span>
+
+    <span class="s3"># Load data</span>
+    <span class="s1">df = pd.read_excel(file_path)</span>
+
+    <span class="s3"># Ensure necessary columns exist</span>
+    <span class="s1">required_columns = {</span><span class="s4">&quot;State&quot;</span><span class="s0">, </span><span class="s4">&quot;City&quot;</span><span class="s0">, </span><span class="s4">&quot;Order Date&quot;</span><span class="s0">, </span><span class="s4">&quot;Sales&quot;</span><span class="s1">}</span>
+    <span class="s0">if not </span><span class="s1">required_columns.issubset(df.columns):</span>
+        <span class="s0">raise </span><span class="s1">ValueError(</span><span class="s4">&quot;Missing required columns in input file&quot;</span><span class="s1">)</span>
+
+    <span class="s3"># Convert 'Order Date' to datetime</span>
+    <span class="s1">df[</span><span class="s4">&quot;Order Date&quot;</span><span class="s1">] = pd.to_datetime(df[</span><span class="s4">&quot;Order Date&quot;</span><span class="s1">]</span><span class="s0">, </span><span class="s1">errors=</span><span class="s4">'coerce'</span><span class="s1">)</span>
+    <span class="s1">df.dropna(subset=[</span><span class="s4">&quot;Order Date&quot;</span><span class="s0">, </span><span class="s4">&quot;City&quot;</span><span class="s1">]</span><span class="s0">, </span><span class="s1">inplace=</span><span class="s0">True</span><span class="s1">)  </span><span class="s3"># Ignore missing dates or cities</span>
+
+    <span class="s3"># Extract year and quarter</span>
+    <span class="s1">df[</span><span class="s4">&quot;Year&quot;</span><span class="s1">] = df[</span><span class="s4">&quot;Order Date&quot;</span><span class="s1">].dt.year</span>
+    <span class="s1">df[</span><span class="s4">&quot;Quarter&quot;</span><span class="s1">] = df[</span><span class="s4">&quot;Order Date&quot;</span><span class="s1">].dt.quarter</span>
+
+    <span class="s3"># Filter data by state and year</span>
+    <span class="s1">df_filtered = df[(df[</span><span class="s4">&quot;State&quot;</span><span class="s1">] == state) &amp; (df[</span><span class="s4">&quot;Year&quot;</span><span class="s1">] == year)]</span>
+
+    <span class="s3"># Aggregate sales by state, city, and quarter</span>
+    <span class="s1">sales_summary = df_filtered.groupby([</span><span class="s4">&quot;State&quot;</span><span class="s0">, </span><span class="s4">&quot;City&quot;</span><span class="s0">, </span><span class="s4">&quot;Quarter&quot;</span><span class="s1">]).agg({</span><span class="s4">&quot;Sales&quot;</span><span class="s1">: </span><span class="s4">&quot;sum&quot;</span><span class="s1">}).reset_index()</span>
+
+    <span class="s3"># Save to an Excel file</span>
+    <span class="s1">sales_summary.to_excel(output_file</span><span class="s0">, </span><span class="s1">index=</span><span class="s0">False</span><span class="s1">)</span>
+    <span class="s1">print(</span><span class="s4">f&quot;Quarterly sales report saved to: </span><span class="s0">{</span><span class="s1">output_file</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s1">)</span>
+
+
+<span class="s3"># Example usage</span>
+<span class="s1">file_path = </span><span class="s4">r&quot;D:\pandas data\IL_state_sales_report_2021.xlsx&quot;</span>
+<span class="s1">output_path = </span><span class="s4">r&quot;D:\pandas data\Quarterly_Sales_Report_IL_2021.xlsx&quot;</span></pre>
+</body>
+</html>

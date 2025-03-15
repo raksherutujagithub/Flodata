@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>ThirdAnswer.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ThirdAnswer.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">from </span><span class="s1">sqlalchemy </span><span class="s0">import </span><span class="s1">create_engine</span>
+
+<span class="s0">def </span><span class="s1">update_orders_and_export():</span>
+    <span class="s2"># Connect to MySQL using SQLAlchemy</span>
+    <span class="s1">engine = create_engine(</span><span class="s3">'mysql+mysqlconnector://root:root@localhost:3306/rutuja'</span><span class="s1">)</span>
+
+    <span class="s2"># Update orders table with location details from ip_data</span>
+    <span class="s0">with </span><span class="s1">engine.connect() </span><span class="s0">as </span><span class="s1">connection:</span>
+        <span class="s1">update_query = </span><span class="s3">''' 
+            UPDATE orders o 
+            JOIN ip_data i ON o.ip_address = i.ip_address 
+            SET o.city = i.city, o.state = i.state, o.zip_code = i.zip_code 
+        '''</span>
+        <span class="s1">connection.execute(update_query)</span>
+
+    <span class="s2"># Export updated orders to CSV file</span>
+    <span class="s1">export_query = </span><span class="s3">''' 
+        SELECT order_number, city, state, zip_code  
+        FROM orders  
+        WHERE city IS NOT NULL 
+    '''</span>
+    <span class="s1">df = pd.read_sql(export_query</span><span class="s0">, </span><span class="s1">con=engine)</span>
+    <span class="s1">df.to_csv(</span><span class="s3">r'D:\pandas data\updated_orders.csv'</span><span class="s0">, </span><span class="s1">index=</span><span class="s0">False</span><span class="s1">)</span>
+
+    <span class="s1">print(</span><span class="s3">&quot;Orders updated and exported successfully!&quot;</span><span class="s1">)</span>
+
+<span class="s2"># Example usage:</span>
+<span class="s1">update_orders_and_export()</span>
+</pre>
+</body>
+</html>
